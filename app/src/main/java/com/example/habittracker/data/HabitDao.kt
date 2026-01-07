@@ -1,11 +1,12 @@
 package com.example.habittracker.data
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDao {
-    @Query("SELECT * FROM habits")
-    suspend fun getAll(): List<Habit>
+    @Query("SELECT * FROM habit_table")
+    fun getAll(): Flow<List<Habit>>
 
     @Insert
     suspend fun insert(habit: Habit)

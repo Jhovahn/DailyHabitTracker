@@ -7,14 +7,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.habittracker.screens.HomeScreen
 import com.example.habittracker.screens.AddEditScreen
 import com.example.habittracker.screens.StatsScreen
+import com.example.habittracker.viewmodel.HabitViewModel
 
 
 @Composable
-fun NavGraph() {
+fun NavGraph(viewModel: HabitViewModel) {
     val navController = rememberNavController()
     NavHost(navController=navController, startDestination = "home") {
-        composable("home") { HomeScreen(navController) }
-        composable("add_edit") { AddEditScreen(navController) }
-        composable("stats") { StatsScreen(navController) }
+        composable("home") { HomeScreen(navController, viewModel) }
+        composable("add_edit") { AddEditScreen(navController, viewModel) }
+        composable("stats") { StatsScreen(navController, viewModel) }
     }
 }
