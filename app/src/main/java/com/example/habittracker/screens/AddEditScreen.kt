@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
 
     var habitName by remember { mutableStateOf("")  }
+    var habitTimerDuration by remember { mutableStateOf("25") }
 
     Scaffold { innerPadding ->
 
@@ -32,10 +33,19 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            TextField(
+                value=habitTimerDuration,
+                onValueChange = { habitTimerDuration = it},
+                label = { Text("Session length in minutes") },
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
             Button(
                 onClick = {
                     if (habitName.isNotBlank()) {
-                        viewModel.addHabit(habitName)
+                        viewModel.addHabit(
+                            name = habitName,
+                            timerDuration = habitTimerDuration.toLong() * 60 * 1000)
                         navController.popBackStack()
                     }
                 },

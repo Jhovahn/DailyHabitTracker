@@ -18,6 +18,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
@@ -50,10 +55,24 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(text=habit.name, modifier=Modifier.weight(1f))
-                            Checkbox(
-                                checked = habit.completed,
-                                onCheckedChange = { viewModel.toggleCompleted(habit) }
-                            )
+
+                            if(habit.completed) {
+                                val emojiUnicode = "\uD83D\uDD25"
+                                Text("$emojiUnicode ${habit.streak}")
+                            } else if(habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()) {
+                                var remaining by remember { mutableLongStateOf( habit.timerEnd - System.currentTimeMillis()) }
+                                LaunchedEffect(habit.timerEnd) {
+                                    while(remaining > 0) {
+                                        delay(1000)
+                                        remaining = habit.timerEnd - System.currentTimeMillis()
+                                    }
+                                }
+                                Text("${formatMillis(remaining)} remaining")
+                            } else {
+                                Button(onClick = { viewModel.startHabitTimer(habit)}) {
+                                    Text("Start")
+                                }
+                            }
                             IconButton(
                                 onClick = { viewModel.deleteHabit(habit) }
                             ) {
@@ -67,3 +86,9 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
     }
 }
 
+fun formatMillis(ms: Long): String {
+    val totalSeconds = ms / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return "%02d:%02d".format(minutes, seconds)
+}

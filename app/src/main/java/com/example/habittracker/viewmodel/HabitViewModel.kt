@@ -7,6 +7,7 @@ import com.example.habittracker.data.Habit
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
 
 
 class HabitViewModel(private val dao: HabitDao): ViewModel() {
@@ -22,15 +23,20 @@ class HabitViewModel(private val dao: HabitDao): ViewModel() {
         }
     }
 
-    fun toggleCompleted(habit: Habit) {
+    fun addHabit(name: String, timerDuration: Long) {
         viewModelScope.launch {
-            dao.update(habit.copy(completed = !habit.completed))
+            dao.insert(Habit(name = name, timerDuration = timerDuration))
         }
     }
 
-    fun addHabit(name: String) {
+    fun startHabitTimer(habit: Habit) {
         viewModelScope.launch {
-            dao.insert(Habit(name = name))
+            val endTime = System.currentTimeMillis() + habit.timerDuration
+            dao.update(habit.copy(timerEnd = endTime))
+            launch {
+                delay(habit.timerDuration)
+                dao.update(habit.copy(timerEnd = null, completed = true))
+            }
         }
     }
 }
