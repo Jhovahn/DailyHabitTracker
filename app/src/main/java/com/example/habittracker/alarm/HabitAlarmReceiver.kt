@@ -1,0 +1,111 @@
+package com.example.habittracker.alarm
+
+
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.os.SystemClock
+import android.provider.Settings
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
+import androidx.core.app.NotificationCompat
+import com.example.habittracker.MainActivity
+import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+
+class HabitAlarmReceiver : BroadcastReceiver() {
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+    override fun onReceive(context: Context, intent: Intent) {
+
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val db = HabitDatabase.getDatabase(context)
+                val dao = db.habitDao()
+                val action = intent.action
+
+                val habitId = intent.getLongExtra("habitId", -1L)
+                if (habitId != -1L) {
+                    dao.getById(habitId)?.let { habit ->
+                        dao.update(habit.copy(completed = true, timerEnd = null))
+                        showNotification(context, habit)
+                    }
+                }
+
+                if (action == Intent.ACTION_BOOT_COMPLETED || action == AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED) {
+                    val habits = dao.getAll().first()
+                    habits.forEach { habit ->
+                        if (habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()) {
+                            rescheduleAlarm(context, habit)
+                        }
+                    }
+                }
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+}
+
+@SuppressLint("ScheduleExactAlarm")
+private fun rescheduleAlarm(context: Context, habit: Habit) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val intent = Intent(context, HabitAlarmReceiver::class.java).apply {
+        putExtra("habitId", habit.id.toLong())
+    }
+    val pendingIntent = PendingIntent.getBroadcast(
+        context, habit.id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    habit.timerEnd?.let { endTime ->
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, endTime, pendingIntent
+        )
+    }
+}
+
+@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+private fun showNotification(context: Context, habit: Habit) {
+    val channelId = "habit_channel"
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+    val fullScreenIntent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        putExtra("habitId", habit.id.toLong())
+    }
+    val fullScreenPendingIntent = PendingIntent.getActivity(
+        context,
+        habit.id,
+        fullScreenIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = android.app.NotificationChannel(
+            channelId, "Habit Notifications", android.app.NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Channel for habit timer completions"
+            enableVibration(true)
+        }
+        notificationManager.createNotificationChannel(channel)
+    }
+    val notification = NotificationCompat.Builder(context, "habit_channel")
+        .setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Way to go! 🔥🔥🔥")
+        .setContentText("${habit.name} session complete!").setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setCategory(NotificationCompat.CATEGORY_ALARM)
+        .setSound(Settings.System.DEFAULT_ALARM_ALERT_URI).setAutoCancel(true).setOngoing(true)
+        .setFullScreenIntent(fullScreenPendingIntent, true)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).build()
+    notificationManager.notify(SystemClock.uptimeMillis().toInt(), notification)
+}
