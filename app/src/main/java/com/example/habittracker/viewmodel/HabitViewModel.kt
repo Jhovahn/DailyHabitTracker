@@ -18,7 +18,6 @@ import com.example.habittracker.data.Habit
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.delay
 import androidx.core.content.getSystemService
 
 
@@ -84,7 +83,7 @@ class HabitViewModel(private val dao: HabitDao) : ViewModel() {
 
     fun resetHabitTimer(habit: Habit) {
         viewModelScope.launch {
-            dao.update(habit.copy(timerEnd = null, completed = true))
+            dao.update(habit.copy(timerEnd = null, completed = true, streak = habit.streak - 1))
         }
     }
 }

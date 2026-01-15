@@ -20,9 +20,13 @@ import com.example.habittracker.viewmodel.HabitViewModel
 @Composable
 fun SuccessScreen(navController: NavController, id: Long, viewModel: HabitViewModel) {
     val habits by viewModel.habits.collectAsState()
-    val habit = habits.find { it.id.toLong() == id}
+    val habit = habits.find { it.id.toLong() == id }
     Scaffold { innerPadding ->
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp).padding(innerPadding),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -31,17 +35,15 @@ fun SuccessScreen(navController: NavController, id: Long, viewModel: HabitViewMo
                 style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier.padding(16.dp)
             )
-            Text(text = "${habit?.name} complete!" )
+            Text(text = "${habit?.name} complete!")
             Text(text = "Duration: ${(habit?.timerDuration?.toInt() ?: 0) / 1000 / 60} minutes")
 
             Button(
                 onClick = {
-                    navController.navigate("home") {
-                    }
-                },
-                modifier = Modifier.padding(16.dp)
+                    navController.navigate("home") {}
+                }, modifier = Modifier.padding(16.dp)
             ) {
-                Text("Home")
+                Text("Dismiss")
             }
         }
     }

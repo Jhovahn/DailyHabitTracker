@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableLongStateOf
@@ -34,6 +36,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.Text
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.lerp
 
 @RequiresApi(Build.VERSION_CODES.S)
 @androidx.annotation.RequiresPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM)
@@ -65,81 +75,139 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                 LazyColumn {
                     if (habits.isNotEmpty()) {
                         items(habits) { habit ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                val timerRunning =
-                                    habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
-                                val context = LocalContext.current
-
-                                Text(text = habit.name, modifier = Modifier.weight(1f))
-                                val emojiUnicode = "\uD83D\uDD25"
-                                val goal = 7
-                                if (!timerRunning) {
-                                    if (habit.streak < goal) {
-                                        Text("${habit.streak} / $goal")
+                            var showConfirmDialog by remember { mutableStateOf(false) }
+                            val dismissState =
+                                rememberSwipeToDismissBoxState(confirmValueChange = { value ->
+                                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                                        showConfirmDialog = true
+                                        viewModel.deleteHabit(habit)
+                                        navController.navigate("home")
+                                        true
                                     } else {
-                                        Text("$emojiUnicode ${habit.streak}")
+                                        false
                                     }
-                                }
-                                if (timerRunning) {
-                                    var remaining by remember {
-                                        mutableLongStateOf(
-                                            habit.timerEnd?.minus(
-                                                System.currentTimeMillis()
-                                            ) ?: 0
+                                }, positionalThreshold = { totalDistance -> totalDistance * 0.5F })
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                enableDismissFromEndToStart = true,
+                                enableDismissFromStartToEnd = false,
+                                backgroundContent = {
+                                    val progress = dismissState.progress
+                                    val isConfirmed =
+                                        dismissState.targetValue != SwipeToDismissBoxValue.Settled
+                                    val isReturning =
+                                        dismissState.targetValue == SwipeToDismissBoxValue.Settled
+                                    val backgroundColor = when {
+                                        isConfirmed -> Color.Red.copy(alpha = 0.4f)
+                                        isReturning -> Color.Transparent
+                                        dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart -> {
+                                            lerp(
+                                                Color.Transparent,
+                                                Color.Red.copy(alpha = 0.4f),
+                                                progress
+                                            )
+                                        }
+
+                                        else -> Color.Transparent
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                backgroundColor, shape = RoundedCornerShape(16.dp)
+                                            )
+                                            .padding(horizontal = 20.dp)
+                                            .clip(
+                                                RoundedCornerShape(16.dp)
+                                            ),
+                                        contentAlignment = Alignment.CenterEnd,
+
+                                        ) {
+                                        val iconAlpha = if (isReturning) 0f else 1.0f
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Dismiss",
+                                            tint = Color.White.copy(alpha = iconAlpha)
                                         )
                                     }
-                                    LaunchedEffect(habit.timerEnd) {
-                                        while (remaining > 0) {
-                                            delay(1000)
-                                            remaining =
-                                                habit.timerEnd?.minus(System.currentTimeMillis())
-                                                    ?: 0
+                                },
+                                content = {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        val timerRunning =
+                                            habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
+                                        val context = LocalContext.current
+
+                                        Text(text = habit.name, modifier = Modifier.weight(1f))
+                                        val emojiUnicode = "\uD83D\uDD25"
+                                        val goal = 7
+                                        if (!timerRunning) {
+                                            if (habit.streak < goal) {
+                                                Text("${habit.streak} / $goal")
+                                            } else {
+                                                Text("$emojiUnicode ${habit.streak}")
+                                            }
+                                        }
+                                        if (timerRunning) {
+                                            var remaining by remember {
+                                                mutableLongStateOf(
+                                                    habit.timerEnd?.minus(
+                                                        System.currentTimeMillis()
+                                                    ) ?: 0
+                                                )
+                                            }
+                                            LaunchedEffect(habit.timerEnd) {
+                                                while (remaining > 0) {
+                                                    delay(1000)
+                                                    remaining =
+                                                        habit.timerEnd?.minus(System.currentTimeMillis())
+                                                            ?: 0
+                                                }
+                                            }
+                                            Text(formatMillis(remaining))
+                                        }
+                                        if (timerRunning) {
+                                            IconButton(
+                                                onClick = { viewModel.resetHabitTimer(habit) }) {
+                                                Icon(
+                                                    Icons.Default.Refresh,
+                                                    contentDescription = "Refresh",
+                                                )
+                                            }
+                                        } else {
+                                            IconButton(
+                                                onClick = {
+                                                    val alarmManager =
+                                                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                                                    val canScheduleExact =
+                                                        alarmManager.canScheduleExactAlarms()
+                                                    if (!canScheduleExact) {
+                                                        val intent =
+                                                            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                                                                data = Uri.fromParts(
+                                                                    "package",
+                                                                    context.packageName,
+                                                                    null
+                                                                )
+                                                            }
+                                                        context.startActivity(intent)
+                                                    }
+                                                    viewModel.startHabitTimer(context, habit)
+                                                },
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.PlayArrow,
+                                                    contentDescription = "Start Timer"
+                                                )
+                                            }
                                         }
                                     }
-                                    Text(formatMillis(remaining))
-                                }
-                                if (timerRunning) {
-                                    IconButton(
-                                        onClick = { viewModel.resetHabitTimer(habit) }) {
-                                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
-                                    }
-                                } else {
-                                    IconButton(
-                                        onClick = {
-                                            val alarmManager =
-                                                context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-                                            val canScheduleExact =
-                                                alarmManager.canScheduleExactAlarms()
-                                            if (!canScheduleExact) {
-                                                val intent =
-                                                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                                                        data = Uri.fromParts(
-                                                            "package", context.packageName, null
-                                                        )
-                                                    }
-                                                context.startActivity(intent)
-                                            }
-                                            viewModel.startHabitTimer(context, habit)
-                                        }, modifier = Modifier.size(36.dp)
-                                    ) {
-
-                                        Icon(
-                                            imageVector = Icons.Default.PlayArrow,
-                                            contentDescription = "Start Timer"
-                                        )
-                                    }
-                                }
-                                IconButton(
-                                    onClick = { viewModel.deleteHabit(habit) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                                }
-                            }
+                                })
                         }
                     }
                 }
@@ -150,7 +218,11 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
 
 fun formatMillis(ms: Long): String {
     val totalSeconds = ms / 1000
-    val minutes = totalSeconds / 60
+    var minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
-    return "%02d:%02d".format(minutes, seconds)
+    val hours = minutes / 60
+    if (hours > 0) minutes %= 60
+    return if (hours > 0) "%d:%02d:%02d".format(hours, minutes, seconds) else "%02d:%02d".format(
+        minutes, seconds
+    )
 }
