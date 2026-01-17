@@ -2,10 +2,11 @@ package com.example.habittracker.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,20 +31,23 @@ fun SuccessScreen(navController: NavController, id: Long, viewModel: HabitViewMo
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "Success",
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(16.dp)
-            )
-            Text(text = "${habit?.name} complete!")
-            Text(text = "Duration: ${(habit?.timerDuration?.toInt() ?: 0) / 1000 / 60} minutes")
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                val minutes = (habit?.timerDuration?.toInt() ?: 0) / 1000 / 60
+                val minutesString = if (minutes > 1) "minutes" else "minute"
+                Text(text = "✅ ${habit?.name}")
+                Text(text = "⏰ $minutes $minutesString")
+                Text(text = "🔥 ${habit?.streak} / 7")
+            }
 
             Button(
+                modifier = Modifier.padding(16.dp).height(35.dp),
                 onClick = {
                     navController.navigate("home") {}
-                }, modifier = Modifier.padding(16.dp)
+                },
             ) {
-                Text("Dismiss")
+                Text("👈")
             }
         }
     }

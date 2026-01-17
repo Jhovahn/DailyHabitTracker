@@ -148,7 +148,7 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                         val goal = 7
                                         if (!timerRunning) {
                                             if (habit.streak < goal) {
-                                                Text("${habit.streak} / $goal")
+                                                Text("${habit.streak}/$goal")
                                             } else {
                                                 Text("$emojiUnicode ${habit.streak}")
                                             }
