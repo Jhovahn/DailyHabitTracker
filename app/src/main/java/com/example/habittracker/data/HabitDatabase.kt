@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [Habit::class], version = 2)
+@Database(entities = [Habit::class], version = 3)
 abstract class HabitDatabase : RoomDatabase()  {
     abstract fun habitDao(): HabitDao
 
@@ -21,7 +21,7 @@ abstract class HabitDatabase : RoomDatabase()  {
                                 context.applicationContext,
                                 HabitDatabase::class.java,
                                 "habit_database"
-                            ).addMigrations(MIGRATION_1_2)
+                            ).addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance
@@ -43,6 +43,20 @@ val MIGRATION_1_2 = object: Migration(1,2) {
         )
         db.execSQL(
             "ALTER TABLE habit_table ADD COLUMN lastCompleted INTEGER"
+        )
+    }
+}
+
+val MIGRATION_2_3 = object: Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "ALTER TABLE habit_table ADD COLUMN weeklyGoal INTEGER NOT NULL DEFAULT 5"
+        )
+        db.execSQL(
+            "ALTER TABLE habit_table ADD COLUMN weeklyCompleted INTEGER NOT NULL DEFAULT 0"
+        )
+        db.execSQL(
+            "ALTER TABLE habit_table ADD COLUMN weekStartTimestamp INTEGER NOT NULL DEFAULT 0"
         )
     }
 }
