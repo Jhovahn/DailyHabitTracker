@@ -144,13 +144,11 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                         val context = LocalContext.current
 
                                         Text(text = habit.name, modifier = Modifier.weight(1f))
-                                        val emojiUnicode = "\uD83D\uDD25"
-                                        val goal = 7
                                         if (!timerRunning) {
-                                            if (habit.streak < goal) {
-                                                Text("${habit.streak}/$goal")
+                                            if (habit.weeklyCompleted < habit.weeklyGoal) {
+                                                Text("${habit.weeklyCompleted}/${habit.weeklyGoal}")
                                             } else {
-                                                Text("$emojiUnicode ${habit.streak}")
+                                                Text("🔥 ${habit.weeklyCompleted}")
                                             }
                                         }
                                         if (timerRunning) {

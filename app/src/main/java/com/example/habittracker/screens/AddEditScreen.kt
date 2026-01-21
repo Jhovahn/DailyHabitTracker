@@ -26,6 +26,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
 
     var habitName by remember { mutableStateOf("") }
     var habitTimerDuration by remember { mutableStateOf("25") }
+    var weeklyGoal by remember { mutableStateOf("5") }
 
     Scaffold { innerPadding ->
         Column(
@@ -55,12 +56,26 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                     keyboardType = KeyboardType.Number
                 )
             )
+
+            TextField(
+                value = weeklyGoal,
+                onValueChange = { newValue ->
+                    weeklyGoal = newValue.filter { it.isDigit() }
+                },
+                label = { Text("Weekly session goal count") },
+                modifier = Modifier.padding(bottom = 16.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                )
+            )
+
             Button(
                 enabled = habitTimerDuration.isNotBlank() && habitName.isNotBlank(), onClick = {
                     if (habitName.isNotBlank()) {
                         viewModel.addHabit(
                             name = habitName,
-                            timerDuration = (habitTimerDuration.toLong()) * 60 * 1000
+                            timerDuration = (habitTimerDuration.toLong()) * 60 * 1000,
+                            weeklyGoal = (weeklyGoal.toInt())
                         )
                         navController.popBackStack()
                     }
