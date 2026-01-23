@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.habittracker.alarm.scheduleWeeklyReset
 import com.example.habittracker.data.HabitDatabase
 import com.example.habittracker.navigation.NavGraph
 import com.example.habittracker.ui.theme.HabitTrackerTheme
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("ScheduleExactAlarm")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        scheduleWeeklyReset(this)
         setShowWhenLocked(true)
         setTurnScreenOn(true)
         incomingHabitId = intent.getLongExtra("habitId", -1)
