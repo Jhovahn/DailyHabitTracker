@@ -2,10 +2,10 @@ package com.example.habittracker
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Bundle
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,15 +26,18 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) {}
     private var incomingHabitId by mutableLongStateOf(-1L)
+
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("ScheduleExactAlarm")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setShowWhenLocked(true)
+        setTurnScreenOn(true)
         incomingHabitId = intent.getLongExtra("habitId", -1)
         val db = HabitDatabase.getDatabase(applicationContext)
         val dao = db.habitDao()
         val viewModelFactory = HabitViewModelFactory(dao)
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkAndRequestPermission()
         }
         setContent {
@@ -49,15 +52,16 @@ class MainActivity : ComponentActivity() {
     private fun checkAndRequestPermission() {
         when {
             ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
+                this, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED -> {
                 //NO NEED TO ASK FOR PERMISSIONS
             }
+
             shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
                 //POTENTIAL DIALOGUE TO EXPLAIN THAT THE APPS NEEDS PERMISSION
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
+
             else -> {
                 //REQUEST PERMISSION
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)

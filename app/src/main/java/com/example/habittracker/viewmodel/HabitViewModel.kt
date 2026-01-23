@@ -1,24 +1,24 @@
 package com.example.habittracker.viewmodel
 
-import com.example.habittracker.alarm.HabitAlarmReceiver
 import android.Manifest
-import android.content.Intent
-import android.app.PendingIntent
 import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
+import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.habittracker.data.HabitDao
+import com.example.habittracker.alarm.HabitAlarmReceiver
 import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitDao
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.stateIn
-import androidx.core.content.getSystemService
+import kotlinx.coroutines.launch
 
 
 class HabitViewModel(private val dao: HabitDao) : ViewModel() {
@@ -34,19 +34,25 @@ class HabitViewModel(private val dao: HabitDao) : ViewModel() {
         }
     }
 
-    fun addHabit(name: String, timerDuration: Long) {
+    fun addHabit(name: String, timerDuration: Long, weeklyGoal: Int) {
         viewModelScope.launch {
-            dao.insert(Habit(name = name, timerDuration = timerDuration))
+            dao.insert(Habit(name = name, timerDuration = timerDuration, weeklyGoal = weeklyGoal))
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
     @RequiresPermission(Manifest.permission.SCHEDULE_EXACT_ALARM)
     fun startHabitTimer(context: Context, habit: Habit) {
-        val endTime = System.currentTimeMillis() + habit.timerDuration
+        val endTime = System.currentTimeMillis() + habit.timerDuration + 1000L
 
         viewModelScope.launch {
-            dao.update(habit.copy(timerEnd = endTime, completed = false, streak = habit.streak + 1))
+            dao.update(
+                habit.copy(
+                    timerEnd = endTime,
+                    completed = false,
+                    weeklyCompleted = habit.weeklyCompleted + 1
+                )
+            )
         }
 
         scheduleAlarm(context, habit.id.toLong(), endTime)
@@ -83,7 +89,11 @@ class HabitViewModel(private val dao: HabitDao) : ViewModel() {
 
     fun resetHabitTimer(habit: Habit) {
         viewModelScope.launch {
-            dao.update(habit.copy(timerEnd = null, completed = true, streak = habit.streak - 1))
+            dao.update(
+                habit.copy(
+                    timerEnd = null, completed = true, weeklyCompleted = habit.weeklyCompleted - 1
+                )
+            )
         }
     }
 }

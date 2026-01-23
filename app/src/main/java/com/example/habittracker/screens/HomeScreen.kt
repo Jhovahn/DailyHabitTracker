@@ -9,47 +9,55 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
-import com.example.habittracker.viewmodel.HabitViewModel
-import androidx.compose.material3.*
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.collectAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
-import kotlinx.coroutines.delay
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.habittracker.alarm.cancelAlarm
+import com.example.habittracker.viewmodel.HabitViewModel
+import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.S)
 @androidx.annotation.RequiresPermission(android.Manifest.permission.SCHEDULE_EXACT_ALARM)
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
     val habits by viewModel.habits.collectAsState()
+    val context = LocalContext.current
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     Scaffold(
         floatingActionButton = {
@@ -141,7 +149,7 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                     ) {
                                         val timerRunning =
                                             habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
-                                        val context = LocalContext.current
+//                                        val context = LocalContext.current
 
                                         Text(text = habit.name, modifier = Modifier.weight(1f))
                                         if (!timerRunning) {
@@ -171,7 +179,10 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                         }
                                         if (timerRunning) {
                                             IconButton(
-                                                onClick = { viewModel.resetHabitTimer(habit) }) {
+                                                onClick = {
+                                                    cancelAlarm(context, habit)
+                                                    viewModel.resetHabitTimer(habit)
+                                                }) {
                                                 Icon(
                                                     Icons.Default.Refresh,
                                                     contentDescription = "Refresh",
@@ -180,8 +191,6 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                         } else {
                                             IconButton(
                                                 onClick = {
-                                                    val alarmManager =
-                                                        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                                                     val canScheduleExact =
                                                         alarmManager.canScheduleExactAlarms()
                                                     if (!canScheduleExact) {

@@ -1,7 +1,6 @@
 package com.example.habittracker.alarm
 
 
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -15,6 +14,7 @@ import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.example.habittracker.MainActivity
 import com.example.habittracker.data.Habit
 import com.example.habittracker.data.HabitDatabase
@@ -41,7 +41,9 @@ class HabitAlarmReceiver : BroadcastReceiver() {
                 if (habitId != -1L) {
                     dao.getById(habitId)?.let { habit ->
                         dao.update(habit.copy(completed = true, timerEnd = null))
-                        showNotification(context, habit)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                            showNotification(context, habit)
+                        }
                     }
                 }
 
@@ -61,7 +63,7 @@ class HabitAlarmReceiver : BroadcastReceiver() {
 }
 
 @SuppressLint("ScheduleExactAlarm")
-private fun rescheduleAlarm(context: Context, habit: Habit) {
+fun rescheduleAlarm(context: Context, habit: Habit) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(context, HabitAlarmReceiver::class.java).apply {
         putExtra("habitId", habit.id.toLong())
@@ -76,6 +78,21 @@ private fun rescheduleAlarm(context: Context, habit: Habit) {
     }
 }
 
+fun cancelAlarm(context: Context, habit: Habit) {
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val intent = Intent(context, HabitAlarmReceiver::class.java).apply {
+        putExtra("habitId", habit.id.toLong())
+    }
+    val pendingIntent = PendingIntent.getBroadcast(
+        context, habit.id, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+    )
+    if (pendingIntent != null) {
+        alarmManager.cancel(pendingIntent)
+        pendingIntent.cancel()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 private fun showNotification(context: Context, habit: Habit) {
     val channelId = "habit_channel"
@@ -91,21 +108,27 @@ private fun showNotification(context: Context, habit: Habit) {
         fullScreenIntent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = android.app.NotificationChannel(
-            channelId, "Habit Notifications", android.app.NotificationManager.IMPORTANCE_HIGH
-        ).apply {
-            description = "Channel for habit timer completions"
-            enableVibration(true)
-        }
-        notificationManager.createNotificationChannel(channel)
+    if (!notificationManager.canUseFullScreenIntent()) {
+        context.startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT))
     }
+    val channel = android.app.NotificationChannel(
+        channelId, "Habit Notifications", android.app.NotificationManager.IMPORTANCE_HIGH
+    ).apply {
+        description = "Channel for habit timer completions"
+        enableVibration(true)
+    }
+    notificationManager.createNotificationChannel(channel)
     val notification = NotificationCompat.Builder(context, "habit_channel")
-        .setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle("Way to go! 🔥🔥🔥")
-        .setContentText("${habit.name} session complete!").setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setContentTitle("Way to go! 🔥🔥🔥")
+        .setContentText("${habit.name} session complete!")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
+        .setFullScreenIntent(fullScreenPendingIntent, true)
         .setSound(Settings.System.DEFAULT_ALARM_ALERT_URI).setAutoCancel(true).setOngoing(true)
         .setFullScreenIntent(fullScreenPendingIntent, true)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).build()
     notificationManager.notify(SystemClock.uptimeMillis().toInt(), notification)
+
+    val serviceIntent = Intent(context, AlarmService::class.java)
+    ContextCompat.startForegroundService(context, serviceIntent)
 }
