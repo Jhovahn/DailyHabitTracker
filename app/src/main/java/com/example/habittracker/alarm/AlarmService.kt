@@ -47,8 +47,8 @@ class AlarmService : Service() {
             val notification =
                 NotificationCompat.Builder(this, channelId).setContentTitle("Timer Finished")
                     .setContentText("Alarming...")
-                    .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setOngoing(true)
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setOngoing(false)
+                    .setDeleteIntent(pendingDismiss).setPriority(NotificationCompat.PRIORITY_LOW)
                     .addAction(R.drawable.ic_stop, "Stop", pendingDismiss)
                     .setStyle(MediaNotificationCompat.MediaStyle().setShowActionsInCompactView(0))
                     .build()
@@ -64,7 +64,8 @@ class AlarmService : Service() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun startAlarm() {
+    fun startAlarm() {
+        if (mediaPlayer?.isPlaying == true) return
         mediaPlayer =
             MediaPlayer.create(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                 .apply {
