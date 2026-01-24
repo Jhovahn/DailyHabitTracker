@@ -124,7 +124,7 @@ private fun showNotification(context: Context, habit: Habit) {
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_ALARM)
         .setFullScreenIntent(fullScreenPendingIntent, true)
-        .setSound(Settings.System.DEFAULT_ALARM_ALERT_URI).setAutoCancel(true).setOngoing(true)
+        .setSound(Settings.System.DEFAULT_ALARM_ALERT_URI).setAutoCancel(true).setOngoing(false)
         .setFullScreenIntent(fullScreenPendingIntent, true)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).build()
     notificationManager.notify(SystemClock.uptimeMillis().toInt(), notification)
