@@ -10,16 +10,22 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.FabPosition
@@ -45,6 +51,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.habittracker.alarm.cancelAlarm
@@ -67,18 +75,40 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
             }
         }, floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
-
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            Column(
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .semantics { heading() },
+                    horizontalArrangement = Arrangement.Absolute.Center
 
+                ) {
+                    val wut = Icons.Default.Info
+                    Text(
+                        text = "Task Streak"
+                    )
+                    Spacer(modifier = Modifier.width(20.dp))
+                    IconButton(
+                        onClick = { navController.navigate("info") },
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(1.dp)
+                    ) {
+                        Icon(wut, contentDescription = "App information")
+                    }
+
+                }
+            }
+            Spacer(modifier = Modifier.height(24.dp))
             if (habits.isEmpty()) {
-                Text(
-                    text = "Not habits yet. Tap + to add one!", color = Color.Red
-                )
+                Text("No habits added so far! click + below!", color = Color.Green)
             } else {
                 LazyColumn {
                     if (habits.isNotEmpty()) {
@@ -149,7 +179,6 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                                     ) {
                                         val timerRunning =
                                             habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
-//                                        val context = LocalContext.current
 
                                         Text(text = habit.name, modifier = Modifier.weight(1f))
                                         if (!timerRunning) {
