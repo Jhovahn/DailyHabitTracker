@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -43,6 +47,12 @@ fun InfoScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.Absolute.Center
                 ) {
                     Text("Task Streak")
+                    Spacer(modifier = Modifier.width(20.dp))
+                    IconButton(
+                        onClick = {navController.navigate("home")}, modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(Icons.Default.Home, contentDescription = "Home Button")
+                    }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
 
