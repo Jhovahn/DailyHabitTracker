@@ -1,16 +1,20 @@
 package com.example.habittracker.screens
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import com.example.habittracker.viewmodel.HabitViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.habittracker.viewmodel.HabitViewModel
 
 @Composable
 fun StatsScreen(navController: NavController, viewModel: HabitViewModel) {
@@ -31,7 +35,8 @@ fun StatsScreen(navController: NavController, viewModel: HabitViewModel) {
 
         LinearProgressIndicator(
             progress = { progress },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(8.dp),
         )
     }
