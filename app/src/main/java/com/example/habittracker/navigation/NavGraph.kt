@@ -11,7 +11,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.habittracker.screens.HomeScreen
 import com.example.habittracker.screens.AddEditScreen
 import com.example.habittracker.screens.InfoScreen
-import com.example.habittracker.screens.StatsScreen
 import com.example.habittracker.viewmodel.HabitViewModel
 import com.example.habittracker.screens.SuccessScreen
 
@@ -33,10 +32,8 @@ fun NavGraph(viewModel: HabitViewModel, habitId: Long) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController, viewModel) }
         composable("add_edit") { AddEditScreen(navController, viewModel) }
-        composable("stats") { StatsScreen(navController, viewModel) }
         composable("info") { InfoScreen(navController) }
         composable("success/${habitId}") { backstackEntry ->
-            val id = backstackEntry.arguments?.getString("habitId")?.toLong() ?: -1L
             SuccessScreen(navController, habitId, viewModel)
         }
     }
