@@ -73,7 +73,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                 modifier = Modifier.padding(bottom = 16.dp),
                 label = {
                     Text(
-                        text = "Enter habit here...", color = Color.Gray, fontSize = 14.sp
+                        text = "Enter task here...", color = Color.Gray, fontSize = 14.sp
                     )
                 },
                 colors = TextFieldDefaults.colors(
