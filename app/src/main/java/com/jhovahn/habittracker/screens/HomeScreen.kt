@@ -1,4 +1,4 @@
-package com.example.habittracker.screens
+package com.jhovahn.habittracker.screens
 
 import android.app.AlarmManager
 import android.content.Context
@@ -55,8 +55,8 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.habittracker.alarm.cancelAlarm
-import com.example.habittracker.viewmodel.HabitViewModel
+import com.jhovahn.habittracker.alarm.cancelAlarm
+import com.jhovahn.habittracker.viewmodel.HabitViewModel
 import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.S)

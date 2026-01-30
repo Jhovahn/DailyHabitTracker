@@ -1,4 +1,4 @@
-package com.example.habittracker.alarm
+package com.jhovahn.habittracker.alarm
 
 
 import android.Manifest
@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
@@ -15,9 +16,9 @@ import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import com.example.habittracker.MainActivity
-import com.example.habittracker.data.Habit
-import com.example.habittracker.data.HabitDatabase
+import com.jhovahn.habittracker.MainActivity
+import com.jhovahn.habittracker.data.Habit
+import com.jhovahn.habittracker.data.HabitDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -109,7 +110,11 @@ private fun showNotification(context: Context, habit: Habit) {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
     if (!notificationManager.canUseFullScreenIntent()) {
-        context.startActivity(Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT))
+        val settingsIntent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            data = Uri.fromParts("package", context.packageName, null)
+        }
+        context.startActivity(settingsIntent)
     }
     val channel = android.app.NotificationChannel(
         channelId, "Habit Notifications", android.app.NotificationManager.IMPORTANCE_HIGH

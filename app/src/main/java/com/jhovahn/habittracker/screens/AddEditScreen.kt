@@ -1,4 +1,4 @@
-package com.example.habittracker.screens
+package com.jhovahn.habittracker.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.habittracker.viewmodel.HabitViewModel
+import com.jhovahn.habittracker.viewmodel.HabitViewModel
 
 @Composable
 fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {

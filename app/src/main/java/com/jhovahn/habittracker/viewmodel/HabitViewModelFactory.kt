@@ -1,8 +1,8 @@
-package com.example.habittracker.viewmodel
+package com.jhovahn.habittracker.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.habittracker.data.HabitDao
+import com.jhovahn.habittracker.data.HabitDao
 
 class HabitViewModelFactory(private val dao: HabitDao): ViewModelProvider.Factory {
     override fun <T: ViewModel> create(modelClass: Class<T>): T {

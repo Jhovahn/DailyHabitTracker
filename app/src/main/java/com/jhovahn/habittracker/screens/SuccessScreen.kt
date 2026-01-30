@@ -1,4 +1,4 @@
-package com.example.habittracker.screens
+package com.jhovahn.habittracker.screens
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.habittracker.alarm.AlarmService
-import com.example.habittracker.viewmodel.HabitViewModel
+import com.jhovahn.habittracker.alarm.AlarmService
+import com.jhovahn.habittracker.viewmodel.HabitViewModel
 
 @Composable
 fun SuccessScreen(navController: NavController, id: Long, viewModel: HabitViewModel) {

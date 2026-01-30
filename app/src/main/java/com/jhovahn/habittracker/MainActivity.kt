@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.jhovahn.habittracker
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -15,12 +15,12 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.habittracker.alarm.scheduleWeeklyReset
-import com.example.habittracker.data.HabitDatabase
-import com.example.habittracker.navigation.NavGraph
-import com.example.habittracker.ui.theme.HabitTrackerTheme
-import com.example.habittracker.viewmodel.HabitViewModel
-import com.example.habittracker.viewmodel.HabitViewModelFactory
+import com.jhovahn.habittracker.alarm.scheduleWeeklyReset
+import com.jhovahn.habittracker.data.HabitDatabase
+import com.jhovahn.habittracker.navigation.NavGraph
+import com.jhovahn.habittracker.ui.theme.HabitTrackerTheme
+import com.jhovahn.habittracker.viewmodel.HabitViewModel
+import com.jhovahn.habittracker.viewmodel.HabitViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(

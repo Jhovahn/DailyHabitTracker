@@ -1,4 +1,4 @@
-package com.example.habittracker.alarm
+package com.jhovahn.habittracker.alarm
 
 import android.app.AlarmManager
 import android.app.PendingIntent

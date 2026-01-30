@@ -1,11 +1,11 @@
-package com.example.habittracker.alarm
+package com.jhovahn.habittracker.alarm
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.habittracker.data.HabitDatabase
+import com.jhovahn.habittracker.data.HabitDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

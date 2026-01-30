@@ -1,4 +1,4 @@
-package com.example.habittracker.navigation
+package com.jhovahn.habittracker.navigation
 
 import android.annotation.SuppressLint
 import android.os.Build
@@ -8,11 +8,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.habittracker.screens.HomeScreen
-import com.example.habittracker.screens.AddEditScreen
-import com.example.habittracker.screens.InfoScreen
-import com.example.habittracker.viewmodel.HabitViewModel
-import com.example.habittracker.screens.SuccessScreen
+import com.jhovahn.habittracker.screens.HomeScreen
+import com.jhovahn.habittracker.screens.AddEditScreen
+import com.jhovahn.habittracker.screens.InfoScreen
+import com.jhovahn.habittracker.viewmodel.HabitViewModel
+import com.jhovahn.habittracker.screens.SuccessScreen
 
 @RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("ScheduleExactAlarm")

@@ -1,4 +1,4 @@
-package com.example.habittracker.alarm
+package com.jhovahn.habittracker.alarm
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -14,7 +14,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.example.habittracker.R
+import com.jhovahn.habittracker.R
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
 
 class AlarmService : Service() {

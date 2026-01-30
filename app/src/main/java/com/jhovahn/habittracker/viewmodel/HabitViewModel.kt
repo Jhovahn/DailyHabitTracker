@@ -1,4 +1,4 @@
-package com.example.habittracker.viewmodel
+package com.jhovahn.habittracker.viewmodel
 
 import android.Manifest
 import android.app.AlarmManager
@@ -13,9 +13,9 @@ import androidx.annotation.RequiresPermission
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.habittracker.alarm.HabitAlarmReceiver
-import com.example.habittracker.data.Habit
-import com.example.habittracker.data.HabitDao
+import com.jhovahn.habittracker.alarm.HabitAlarmReceiver
+import com.jhovahn.habittracker.data.Habit
+import com.jhovahn.habittracker.data.HabitDao
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch

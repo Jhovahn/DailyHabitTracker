@@ -1,4 +1,4 @@
-package com.example.habittracker.screens
+package com.jhovahn.habittracker.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

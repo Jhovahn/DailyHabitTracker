@@ -1,4 +1,4 @@
-package com.example.habittracker
+package com.jhovahn.habittracker
 
 import org.junit.Test
 

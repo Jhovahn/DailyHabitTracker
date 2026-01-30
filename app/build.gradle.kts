@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.habittracker"
+    namespace = "com.jhovahn.habittracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.habittracker"
+        applicationId = "com.jhovahn.habittracker"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

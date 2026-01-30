@@ -1,4 +1,4 @@
-package com.example.habittracker.data
+package com.jhovahn.habittracker.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
