@@ -209,6 +209,7 @@ fun HabitListItem(
                         }
                     }
                 })
+            if(dismissState.targetValue === SwipeToDismissBoxValue.EndToStart) expanded = false
             AnimatedVisibility(
                 visible = expanded
             ) {
