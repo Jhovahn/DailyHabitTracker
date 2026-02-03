@@ -7,8 +7,10 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,18 +25,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -42,74 +42,75 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jhovahn.habittracker.alarm.cancelAlarm
-
 import com.jhovahn.habittracker.data.Habit
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
 import kotlinx.coroutines.delay
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun HabitListItem(habit: Habit, modifier: Modifier, viewModel: HabitViewModel, navController: NavController) {
+fun HabitListItem(
+    habit: Habit,
+    modifier: Modifier,
+    viewModel: HabitViewModel,
+    navController: NavController,
+) {
     val context = LocalContext.current
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val isActive = habit.timerEnd != null
     val isDark = isSystemInDarkTheme()
-    val accentColor = if(isActive)
-        if(isDark) Color(0xFF6EE787) else Color(0xFF34D399)
+    val accentColor = if (isActive) if (isDark) Color(0xFF6EE787) else Color(0xFF34D399)
     else MaterialTheme.colorScheme.outlineVariant
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         border = BorderStroke(1.5.dp, accentColor),
         modifier = modifier
-            .fillMaxWidth(),
-//            .padding(horizontal = 8.dp, vertical = 2.dp),
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
         ),
-        colors=CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
     ) {
         Column(
-            modifier = Modifier.padding(2.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp)
+            modifier = Modifier.padding(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             var showConfirmDialog by remember { mutableStateOf(false) }
-            val dismissState =
-                rememberSwipeToDismissBoxState(confirmValueChange = { value ->
-                    if (value == SwipeToDismissBoxValue.EndToStart) {
-                        showConfirmDialog = true
-                        viewModel.deleteHabit(habit)
-                        navController.navigate("home")
-                        true
-                    } else {
-                        false
-                    }
-                }, positionalThreshold = { totalDistance -> totalDistance * 0.5F })
+            val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { value ->
+                if (value == SwipeToDismissBoxValue.EndToStart) {
+                    showConfirmDialog = true
+                    viewModel.deleteHabit(habit)
+                    navController.navigate("home")
+                    true
+                } else {
+                    false
+                }
+            }, positionalThreshold = { totalDistance -> totalDistance * 0.5F })
             SwipeToDismissBox(
                 state = dismissState,
                 enableDismissFromEndToStart = true,
                 enableDismissFromStartToEnd = false,
                 backgroundContent = {
                     val progress = dismissState.progress
-                    val isConfirmed =
-                        dismissState.targetValue != SwipeToDismissBoxValue.Settled
-                    val isReturning =
-                        dismissState.targetValue == SwipeToDismissBoxValue.Settled
+                    val isConfirmed = dismissState.targetValue != SwipeToDismissBoxValue.Settled
+                    val isReturning = dismissState.targetValue == SwipeToDismissBoxValue.Settled
                     val backgroundColor = when {
                         isConfirmed -> Color.Red.copy(alpha = 0.4f)
                         isReturning -> Color.Transparent
                         dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart -> {
                             lerp(
-                                Color.Transparent,
-                                Color.Red.copy(alpha = 0.4f),
-                                progress
+                                Color.Transparent, Color.Red.copy(alpha = 0.4f), progress
                             )
                         }
 
@@ -147,8 +148,8 @@ fun HabitListItem(habit: Habit, modifier: Modifier, viewModel: HabitViewModel, n
                     ) {
                         val timerRunning =
                             habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
-
-                        Text(text = habit.name, modifier = Modifier.weight(1f))
+                        val chevron = if (expanded) "\u25B2" else "\u25BC"
+                        Text(text = "${habit.name} $chevron", modifier = Modifier.weight(1f))
                         if (!timerRunning) {
                             if (habit.weeklyCompleted < habit.weeklyGoal) {
                                 Text("${habit.weeklyCompleted}/${habit.weeklyGoal}")
@@ -168,8 +169,7 @@ fun HabitListItem(habit: Habit, modifier: Modifier, viewModel: HabitViewModel, n
                                 while (remaining > 0) {
                                     delay(1000)
                                     remaining =
-                                        habit.timerEnd?.minus(System.currentTimeMillis())
-                                            ?: 0
+                                        habit.timerEnd?.minus(System.currentTimeMillis()) ?: 0
                                 }
                             }
                             Text(formatMillis(remaining))
@@ -188,15 +188,12 @@ fun HabitListItem(habit: Habit, modifier: Modifier, viewModel: HabitViewModel, n
                         } else {
                             IconButton(
                                 onClick = {
-                                    val canScheduleExact =
-                                        alarmManager.canScheduleExactAlarms()
+                                    val canScheduleExact = alarmManager.canScheduleExactAlarms()
                                     if (!canScheduleExact) {
                                         val intent =
                                             Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                                                 data = Uri.fromParts(
-                                                    "package",
-                                                    context.packageName,
-                                                    null
+                                                    "package", context.packageName, null
                                                 )
                                             }
                                         context.startActivity(intent)
@@ -212,6 +209,11 @@ fun HabitListItem(habit: Habit, modifier: Modifier, viewModel: HabitViewModel, n
                         }
                     }
                 })
+            AnimatedVisibility(
+                visible = expanded
+            ) {
+                HabitDetails(habit)
+            }
         }
     }
 }
