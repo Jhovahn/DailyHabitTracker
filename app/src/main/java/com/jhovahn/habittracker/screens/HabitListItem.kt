@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +51,8 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jhovahn.habittracker.alarm.AlarmService
+import com.jhovahn.habittracker.alarm.AlarmState
 import com.jhovahn.habittracker.alarm.cancelAlarm
 import com.jhovahn.habittracker.data.Habit
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
@@ -66,15 +70,27 @@ fun HabitListItem(
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val isActive = habit.timerEnd != null
     val isDark = isSystemInDarkTheme()
-    val accentColor = if (isActive) if (isDark) Color(0xFF6EE787) else Color(0xFF34D399)
-    else MaterialTheme.colorScheme.outlineVariant
+    val darkerGreen = Color(0xFF6EE787)
+    val lighterGreen = Color(0xFF34D399)
+    val red = Color(0xFFE53935)
+    val activeAlarmId by viewModel.activeAlarmId.collectAsState()
+    val itemTriggeredAlarm = activeAlarmId.toInt() == habit.id
+    val accentColor = if (isActive) if (isDark) darkerGreen else lighterGreen
+    else if (AlarmState.isRinging(context) && itemTriggeredAlarm) red else MaterialTheme.colorScheme.outlineVariant
     var expanded by remember { mutableStateOf(false) }
+    val serviceIntent = Intent(context, AlarmService::class.java)
 
     Card(
         border = BorderStroke(1.5.dp, accentColor),
         modifier = modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded },
+            .clickable {
+                if (itemTriggeredAlarm) {
+                    context.stopService(serviceIntent)
+                } else {
+                    expanded = !expanded
+                }
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -149,12 +165,17 @@ fun HabitListItem(
                         val timerRunning =
                             habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
                         val chevron = if (expanded) "\u25B2" else "\u25BC"
-                        Text(text = "${habit.name} $chevron", modifier = Modifier.weight(1f))
+                        Text(text = "${habit.name} $chevron", modifier = Modifier.weight(1f).padding(top = 16.dp, bottom = 16.dp))
                         if (!timerRunning) {
                             if (habit.weeklyCompleted < habit.weeklyGoal) {
                                 Text("${habit.weeklyCompleted}/${habit.weeklyGoal}")
                             } else {
                                 Text("🔥 ${habit.weeklyCompleted}")
+                            }
+                        }
+                        if (itemTriggeredAlarm) {
+                            IconButton(onClick = { context.stopService(serviceIntent) }) {
+                                Icon(Icons.Default.Notifications, contentDescription = "Alarm")
                             }
                         }
                         if (timerRunning) {
@@ -172,7 +193,7 @@ fun HabitListItem(
                                         habit.timerEnd?.minus(System.currentTimeMillis()) ?: 0
                                 }
                             }
-                            Text(formatMillis(remaining))
+                            Text(formatMillis(remaining), color = accentColor)
                         }
                         if (timerRunning) {
                             IconButton(
@@ -185,7 +206,7 @@ fun HabitListItem(
                                     contentDescription = "Refresh",
                                 )
                             }
-                        } else {
+                        } else if (!itemTriggeredAlarm) {
                             IconButton(
                                 onClick = {
                                     val canScheduleExact = alarmManager.canScheduleExactAlarms()
@@ -203,13 +224,13 @@ fun HabitListItem(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = "Start Timer"
+                                    contentDescription = "Start Timer",
                                 )
                             }
                         }
                     }
                 })
-            if(dismissState.targetValue === SwipeToDismissBoxValue.EndToStart) expanded = false
+            if (dismissState.targetValue === SwipeToDismissBoxValue.EndToStart) expanded = false
             AnimatedVisibility(
                 visible = expanded
             ) {

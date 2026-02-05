@@ -96,6 +96,7 @@ fun cancelAlarm(context: Context, habit: Habit) {
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 private fun showNotification(context: Context, habit: Habit) {
+    AlarmState.setRinging(context, true, habit)
     val channelId = "habit_channel"
     val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager

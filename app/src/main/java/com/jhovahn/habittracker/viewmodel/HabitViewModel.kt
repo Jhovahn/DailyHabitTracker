@@ -13,15 +13,24 @@ import androidx.annotation.RequiresPermission
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jhovahn.habittracker.alarm.AlarmState
 import com.jhovahn.habittracker.alarm.HabitAlarmReceiver
 import com.jhovahn.habittracker.data.Habit
 import com.jhovahn.habittracker.data.HabitDao
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 
 class HabitViewModel(private val dao: HabitDao) : ViewModel() {
+    var activeAlarmId =
+        AlarmState.activeAlarmId.map { id: Number -> if (id != -1) id else -1 }.stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = -1
+            )
+
     val habits = dao.getAll().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),

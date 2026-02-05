@@ -13,6 +13,7 @@ room = "2.8.4"
 navigation = "2.7.3"
 kotlinx-coroutines = "1.7.3"
 androidxMedia = "1.7.1"
+activityKtx = "1.9.3"
 
 [libraries]
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation"}
@@ -36,6 +37,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines"}
 androidx-media = { group = "androidx.media", name = "media", version.ref = "androidxMedia"}
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

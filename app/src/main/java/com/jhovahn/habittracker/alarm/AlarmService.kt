@@ -81,6 +81,7 @@ class AlarmService : Service() {
         mediaPlayer?.stop()
         mediaPlayer?.release()
         vibrator?.cancel()
+        AlarmState.setRinging(this, ringing = false, habit = null)
         super.onDestroy()
     }
 
