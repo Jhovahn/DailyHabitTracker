@@ -11,24 +11,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -63,25 +58,22 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                     horizontalArrangement = Arrangement.Absolute.Center
 
                 ) {
-                    val wut = Icons.Default.Info
                     Text(
                         text = "Task Streak"
                     )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    IconButton(
-                        onClick = { navController.navigate("info") },
-                        modifier = Modifier
-                            .size(24.dp)
-                            .padding(1.dp)
-                    ) {
-                        Icon(wut, contentDescription = "App information")
-                    }
-
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (habits.isEmpty()) {
-                Text("No habits added so far! click + below!", color = Color.Green)
+                Text("""
+                    |Add your tasks using + with the task name, time in minutes and weekly session goal. 
+                    |
+                    |You will see a list with all tasks next to a play button to start the timer
+                    |
+                    |App keeps count of each session completed and triggers an alarm at the end of each timer.
+                    |
+                    |Counts reset at 4 AM every Monday.  
+                """.trimMargin())
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
