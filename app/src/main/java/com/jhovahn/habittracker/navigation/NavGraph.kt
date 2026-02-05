@@ -10,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jhovahn.habittracker.screens.HomeScreen
 import com.jhovahn.habittracker.screens.AddEditScreen
-import com.jhovahn.habittracker.screens.InfoScreen
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
 import com.jhovahn.habittracker.screens.SuccessScreen
 
@@ -32,7 +31,6 @@ fun NavGraph(viewModel: HabitViewModel, habitId: Long) {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { HomeScreen(navController, viewModel) }
         composable("add_edit") { AddEditScreen(navController, viewModel) }
-        composable("info") { InfoScreen(navController) }
         composable("success/${habitId}") { backstackEntry ->
             SuccessScreen(navController, habitId, viewModel)
         }

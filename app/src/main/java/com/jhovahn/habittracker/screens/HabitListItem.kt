@@ -100,7 +100,7 @@ fun HabitListItem(
         ),
     ) {
         Column(
-            modifier = Modifier.padding(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             var showConfirmDialog by remember { mutableStateOf(false) }
             val dismissState = rememberSwipeToDismissBoxState(confirmValueChange = { value ->
@@ -165,7 +165,12 @@ fun HabitListItem(
                         val timerRunning =
                             habit.timerEnd != null && habit.timerEnd > System.currentTimeMillis()
                         val chevron = if (expanded) "\u25B2" else "\u25BC"
-                        Text(text = "${habit.name} $chevron", modifier = Modifier.weight(1f).padding(top = 16.dp, bottom = 16.dp))
+                        Text(
+                            text = "${habit.name} $chevron",
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = 16.dp, bottom = 16.dp)
+                        )
                         if (!timerRunning) {
                             if (habit.weeklyCompleted < habit.weeklyGoal) {
                                 Text("${habit.weeklyCompleted}/${habit.weeklyGoal}")

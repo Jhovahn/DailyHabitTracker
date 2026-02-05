@@ -8,14 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -55,13 +49,6 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                     horizontalArrangement = Arrangement.Absolute.Center
                 ) {
                     Text(text = "Task Streak")
-                    Spacer(modifier = Modifier.width(20.dp))
-                    IconButton(
-                        onClick = { navController.navigate("home") },
-                        modifier = Modifier.size(24.dp)
-                    ) {
-                        Icon(Icons.Default.Home, contentDescription = "Home Button")
-                    }
                 }
             }
 
@@ -86,35 +73,35 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
 
             TextField(
                 value = habitTimerDuration, onValueChange = { newValue ->
-                habitTimerDuration = newValue.filter { it.isDigit() }
-            }, label = {
-                Text(
-                    text = "Session length in minutes...", color = Color.Gray, fontSize = 14.sp
+                    habitTimerDuration = newValue.filter { it.isDigit() }
+                }, label = {
+                    Text(
+                        text = "Session length in minutes...", color = Color.Gray, fontSize = 14.sp
+                    )
+                }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ), colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
-            }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ), colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            )
             )
             TextField(
                 value = weeklyGoal, onValueChange = { newValue ->
-                weeklyGoal = newValue.filter { it.isDigit() }
-            }, label = {
-                Text(
-                    text = "Weekly session goal...", color = Color.Gray, fontSize = 14.sp
+                    weeklyGoal = newValue.filter { it.isDigit() }
+                }, label = {
+                    Text(
+                        text = "Weekly session goal...", color = Color.Gray, fontSize = 14.sp
+                    )
+                }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number
+                ), colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
                 )
-            }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number
-            ), colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent
-            )
             )
             val isEnabled =
                 habitTimerDuration.isNotBlank() && habitName.isNotBlank() && weeklyGoal.isNotBlank()
