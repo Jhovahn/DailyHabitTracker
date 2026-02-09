@@ -2,6 +2,7 @@ package com.jhovahn.habittracker.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,19 +12,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -39,10 +45,13 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
+                modifier = Modifier
+                    .height(35.dp)
+                    .width(30.dp),
                 onClick = { navController.navigate("add_edit") }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Habit")
             }
-        }, floatingActionButtonPosition = FabPosition.End
+        }, floatingActionButtonPosition = FabPosition.Center
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -65,15 +74,26 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (habits.isEmpty()) {
-                Text("""
-                    |Add your tasks using + with the task name, time in minutes and weekly session goal. 
+                Card(
+                    border = BorderStroke(1.5.dp, Color.DarkGray),
+                    modifier = Modifier.padding(16.dp),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Text(
+                        text = """
+                    |Add your tasks using "+" below with the task name, time in minutes and weekly session goal. 
                     |
-                    |You will see a list with all tasks next to a play button to start the timer
+                    |You will see a list with all tasks next to a play button to start the timer.
                     |
-                    |App keeps count of each session completed and triggers an alarm at the end of each timer.
+                    |App keeps count of each session completed and triggers an alarm at the end of each session.
                     |
                     |Counts reset at 4 AM every Monday.  
-                """.trimMargin())
+                """.trimMargin(), modifier = Modifier.padding(16.dp)
+                    )
+                }
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
