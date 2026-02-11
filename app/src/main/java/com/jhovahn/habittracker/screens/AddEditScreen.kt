@@ -36,9 +36,9 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
     var goalCount by remember { mutableStateOf("") }
 
     fun getTotalTime(): Int {
-        val h = if(hours.isBlank()) 0 else  hours.toInt() * 60 * 60 * 1000
-        val m = if(minutes.isBlank()) 0 else  minutes.toInt() * 1 * 60 * 1000
-        val s = if(seconds.isBlank()) 0 else seconds.toInt() * 1000
+        val h = if (hours.isBlank()) 0 else hours.toInt() * 60 * 60 * 1000
+        val m = if (minutes.isBlank()) 0 else minutes.toInt() * 1 * 60 * 1000
+        val s = if (seconds.isBlank()) 0 else seconds.toInt() * 1000
         return h + m + s
     }
 
@@ -85,9 +85,15 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                 modifier = Modifier.padding(start = 40.dp)
 
             ) {
-                NumberScroll(onValueChange = { hours = it }, limit = 102, beforeLabel = "H", default = 0)
-                NumberScroll( onValueChange = {minutes = it }, limit = 61, beforeLabel = "M", default = 25)
-                NumberScroll(onValueChange = { seconds = it }, limit = 61, beforeLabel = "S", default = 0)
+                NumberScroll(
+                    onValueChange = { hours = it }, limit = 102, beforeLabel = "H", default = 1
+                )
+                NumberScroll(
+                    onValueChange = { minutes = it }, limit = 61, beforeLabel = "M", default = 26
+                )
+                NumberScroll(
+                    onValueChange = { seconds = it }, limit = 61, beforeLabel = "S", default = 1
+                )
             }
 
             Row(
@@ -97,7 +103,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                     onValueChange = { goalCount = it },
                     limit = 1000000,
                     afterLabel = "times per week",
-                    default = 5
+                    default = 6
                 )
             }
             val isEnabled = totalTime > 0 && habitName.isNotBlank() && goalCount.toInt() > 0
@@ -111,8 +117,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                         )
                         navController.navigate("home")
                     }
-                },
-                modifier = Modifier.padding(top = 8.dp)
+                }, modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text("Save")
             }
