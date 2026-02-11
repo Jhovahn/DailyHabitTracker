@@ -42,10 +42,9 @@ fun SuccessScreen(navController: NavController, id: Long, viewModel: HabitViewMo
                 verticalArrangement = Arrangement.spacedBy(16.dp),
 
                 ) {
-                val minutes = (habit?.timerDuration?.toInt() ?: 0) / 1000 / 60
-                val minutesString = if (minutes > 1) "mins" else "min"
+                val time = formatTime(habit?.timerDuration ?: 0)
                 Text(text = "✅ ${habit?.name}")
-                Text(text = "⏰ $minutes $minutesString")
+                Text(text = "⏰ $time")
                 Text(text = "🔥 ${habit?.weeklyCompleted} / ${habit?.weeklyGoal}")
             }
 
