@@ -84,13 +84,15 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                 ) {
                     Text(
                         text = """
-                    |Add your tasks using "+" below with the task name, time in minutes and weekly session goal. 
+                    |Add your task name, session duration and weekly session goal. 
                     |
-                    |You will see a list with all tasks next to a play button to start the timer.
+                    |You will see a list with all yours tasks next to a start timer button.
                     |
-                    |App keeps count of each session completed and triggers an alarm at the end of each session.
+                    |Start timer at beginning of each session. 
                     |
-                    |Counts reset at 4 AM every Monday.  
+                    |App keeps count of each session completed and triggers an alarm at the end.
+                    |
+                    |Progress resets at 4 AM every Monday.  
                 """.trimMargin(), modifier = Modifier.padding(16.dp)
                     )
                 }
