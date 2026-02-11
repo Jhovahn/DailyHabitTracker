@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -32,8 +30,19 @@ import com.jhovahn.habittracker.viewmodel.HabitViewModel
 fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
 
     var habitName by remember { mutableStateOf("") }
-    var habitTimerDuration by remember { mutableStateOf("") }
-    var weeklyGoal by remember { mutableStateOf("") }
+    var hours by remember { mutableStateOf("") }
+    var minutes by remember { mutableStateOf("") }
+    var seconds by remember { mutableStateOf("") }
+    var goalCount by remember { mutableStateOf("") }
+
+    fun getTotalTime(): Int {
+        val h = if(hours.isBlank()) 0 else  hours.toInt() * 60 * 60 * 1000
+        val m = if(minutes.isBlank()) 0 else  minutes.toInt() * 1 * 60 * 1000
+        val s = if(seconds.isBlank()) 0 else seconds.toInt() * 1000
+        return h + m + s
+    }
+
+    val totalTime = getTotalTime()
 
     Scaffold { innerPadding ->
         Column(
@@ -71,54 +80,39 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                 )
             )
 
-            TextField(
-                value = habitTimerDuration, onValueChange = { newValue ->
-                    habitTimerDuration = newValue.filter { it.isDigit() }
-                }, label = {
-                    Text(
-                        text = "Session length in minutes...", color = Color.Gray, fontSize = 14.sp
-                    )
-                }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ), colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(start = 40.dp)
+
+            ) {
+                NumberScroll(onValueChange = { hours = it }, limit = 102, beforeLabel = "H", default = 0)
+                NumberScroll( onValueChange = {minutes = it }, limit = 61, beforeLabel = "M", default = 25)
+                NumberScroll(onValueChange = { seconds = it }, limit = 61, beforeLabel = "S", default = 0)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                NumberScroll(
+                    onValueChange = { goalCount = it },
+                    limit = 1000000,
+                    afterLabel = "times per week",
+                    default = 5
                 )
-            )
-            TextField(
-                value = weeklyGoal, onValueChange = { newValue ->
-                    weeklyGoal = newValue.filter { it.isDigit() }
-                }, label = {
-                    Text(
-                        text = "Weekly session goal...", color = Color.Gray, fontSize = 14.sp
-                    )
-                }, modifier = Modifier.padding(bottom = 16.dp), keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                ), colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
-                )
-            )
-            val isEnabled =
-                habitTimerDuration.isNotBlank() && habitName.isNotBlank() && weeklyGoal.isNotBlank()
+            }
+            val isEnabled = totalTime > 0 && habitName.isNotBlank() && goalCount.toInt() > 0
             Button(
                 enabled = isEnabled, onClick = {
                     if (habitName.isNotBlank()) {
                         viewModel.addHabit(
                             name = habitName,
-                            timerDuration = (habitTimerDuration.toLong()) * 60 * 1000,
-                            weeklyGoal = (weeklyGoal.toInt())
+                            timerDuration = totalTime.toLong(),
+                            weeklyGoal = (goalCount.toInt())
                         )
                         navController.navigate("home")
                     }
-                    if (habitTimerDuration.toFloat() < 0) {
-                        habitTimerDuration = (habitTimerDuration.toLong() * 60 * 1000).toString()
-                    }
-                }, modifier = Modifier.padding(top = 8.dp)
+                },
+                modifier = Modifier.padding(top = 8.dp)
             ) {
                 Text("Save")
             }
