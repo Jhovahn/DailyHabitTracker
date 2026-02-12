@@ -108,6 +108,7 @@ fun HabitListItem(
                     showConfirmDialog = true
                     viewModel.deleteHabit(habit)
                     navController.navigate("home")
+                    context.stopService(serviceIntent)
                     true
                 } else {
                     false
