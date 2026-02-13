@@ -2,6 +2,7 @@ package com.jhovahn.habittracker.screens
 
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,25 +30,11 @@ fun NumberScroll(
     default: Int = 0,
 ) {
     val state = rememberLazyListState(
-        initialFirstVisibleItemIndex = default, initialFirstVisibleItemScrollOffset = -10
+        initialFirstVisibleItemIndex = default
     )
     val snapBehavior = rememberSnapFlingBehavior(lazyListState = state)
     val showNumber by remember { derivedStateOf { state.firstVisibleItemIndex } }
-    val centerIndex by remember {
-        derivedStateOf {
-            val layoutInfo = state.layoutInfo
-            val visibleItems = layoutInfo.visibleItemsInfo
-            if (visibleItems.isEmpty()) -1 else {
-                val viewPortCenter =
-                    (layoutInfo.viewportStartOffset + layoutInfo.viewportEndOffset) / 2
-
-                visibleItems.minByOrNull { item ->
-                    val itemCenter = item.offset + (item.size / 2)
-                    kotlin.math.abs(itemCenter - viewPortCenter)
-                }?.index ?: -1
-            }
-        }
-    }
+    val zeroString by remember { derivedStateOf { if (showNumber < 10) "0" else "" } }
 
     LaunchedEffect(state.isScrollInProgress) {
         if (!state.isScrollInProgress) {
@@ -65,20 +52,20 @@ fun NumberScroll(
         )
 
         LazyColumn(
+            contentPadding = PaddingValues(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             state = state,
             flingBehavior = snapBehavior,
             modifier = Modifier
                 .height(80.dp)
                 .padding(16.dp)
         ) {
-
             items(limit) { index ->
-                val isSelected = index == centerIndex
                 Text(
-                    text = "$showNumber",
+                    text = "${zeroString}$showNumber",
                     modifier = Modifier
-                        .scale(if (isSelected) 1.5f else 1.0f)
-                        .padding(8.dp)
+                        .scale(1.2F)
+                        .padding(8.dp),
                 )
             }
         }

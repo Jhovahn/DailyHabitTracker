@@ -86,13 +86,13 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
 
             ) {
                 NumberScroll(
-                    onValueChange = { hours = it }, limit = 102, beforeLabel = "H", default = 1
+                    onValueChange = { hours = it }, limit = 101, beforeLabel = "H", default = 0
                 )
                 NumberScroll(
-                    onValueChange = { minutes = it }, limit = 61, beforeLabel = "M", default = 26
+                    onValueChange = { minutes = it }, limit = 60, beforeLabel = "M", default = 25
                 )
                 NumberScroll(
-                    onValueChange = { seconds = it }, limit = 61, beforeLabel = "S", default = 1
+                    onValueChange = { seconds = it }, limit = 60, beforeLabel = "S", default = 0
                 )
             }
 
@@ -103,7 +103,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                     onValueChange = { goalCount = it },
                     limit = 1000000,
                     afterLabel = "times per week",
-                    default = 6
+                    default = 5
                 )
             }
             val isEnabled = totalTime > 0 && habitName.isNotBlank() && goalCount.toInt() > 0
