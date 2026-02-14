@@ -55,6 +55,7 @@ import com.jhovahn.habittracker.alarm.AlarmService
 import com.jhovahn.habittracker.alarm.AlarmState
 import com.jhovahn.habittracker.alarm.cancelAlarm
 import com.jhovahn.habittracker.data.Habit
+import com.jhovahn.habittracker.ui.theme.listItemFontFamily
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
 import kotlinx.coroutines.delay
 
@@ -170,7 +171,8 @@ fun HabitListItem(
                             text = "${habit.name} $chevron",
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(top = 16.dp, bottom = 16.dp)
+                                .padding(top = 16.dp, bottom = 16.dp),
+                            fontFamily = listItemFontFamily,
                         )
                         if (!timerRunning) {
                             if (habit.weeklyCompleted < habit.weeklyGoal) {
@@ -187,16 +189,16 @@ fun HabitListItem(
                         if (timerRunning) {
                             var remaining by remember {
                                 mutableLongStateOf(
-                                    habit.timerEnd?.minus(
+                                    habit.timerEnd.minus(
                                         System.currentTimeMillis()
-                                    ) ?: 0
+                                    )
                                 )
                             }
                             LaunchedEffect(habit.timerEnd) {
                                 while (remaining > 0) {
                                     delay(1000)
                                     remaining =
-                                        habit.timerEnd?.minus(System.currentTimeMillis()) ?: 0
+                                        habit.timerEnd.minus(System.currentTimeMillis())
                                 }
                             }
                             Text(formatMillis(remaining), color = accentColor)

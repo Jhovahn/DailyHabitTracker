@@ -66,4 +66,5 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.media)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.ui.text.google.fonts)
 }

@@ -2,7 +2,6 @@ package com.jhovahn.habittracker.screens
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,23 +16,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jhovahn.habittracker.ui.theme.homeFontFamily
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -41,7 +37,6 @@ import com.jhovahn.habittracker.viewmodel.HabitViewModel
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
     val habits by viewModel.habits.collectAsState()
-
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -67,35 +62,27 @@ fun HomeScreen(navController: NavController, viewModel: HabitViewModel) {
                     horizontalArrangement = Arrangement.Absolute.Center
 
                 ) {
-                    Text(
-                        text = "Task Streak"
-                    )
+                    AppHeader("Task Streak", modifier = Modifier)
+
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (habits.isEmpty()) {
-                Card(
-                    border = BorderStroke(1.5.dp, Color.DarkGray),
-                    modifier = Modifier.padding(16.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Text(
-                        text = """
-                    |Add your task name, session duration and weekly session goal. 
+                Text(
+                    text = """
+                    |Add your task name, session duration and weekly target. 
                     |
-                    |You will see a list with all yours tasks next to a start timer button.
+                    |You will see all your tasks next to its start timer button.
                     |
                     |Start timer at beginning of each session. 
                     |
                     |App keeps count of each session completed and triggers an alarm at the end.
                     |
-                    |Progress resets at 4 AM every Monday.  
-                """.trimMargin(), modifier = Modifier.padding(16.dp)
-                    )
-                }
+                    |Progress resets at 4 AM every Monday. 
+                    | 
+                    |You got this!
+                """.trimMargin(), modifier = Modifier.padding(16.dp), fontFamily = homeFontFamily
+                )
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),

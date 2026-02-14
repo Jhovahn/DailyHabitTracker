@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.jhovahn.habittracker.ui.theme.listItemFontFamily
 import com.jhovahn.habittracker.viewmodel.HabitViewModel
 
 @Composable
@@ -57,7 +58,7 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Absolute.Center
                 ) {
-                    Text(text = "Task Streak")
+                    AppHeader("Task Streak", modifier = Modifier)
                 }
             }
 
@@ -69,7 +70,10 @@ fun AddEditScreen(navController: NavController, viewModel: HabitViewModel) {
                 modifier = Modifier.padding(bottom = 16.dp),
                 label = {
                     Text(
-                        text = "Enter task here...", color = Color.Gray, fontSize = 14.sp
+                        text = "Enter task here...",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        fontFamily = listItemFontFamily
                     )
                 },
                 colors = TextFieldDefaults.colors(
